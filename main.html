@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crazy thrifts - Curated Thrift Store</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: '#D4856A',
+                        sage: '#8B9D83',
+                        dustyRose: '#D4A5A5',
+                        cream: '#FAF7F2',
+                        charcoal: '#2C2C2C',
+                        warmBeige: '#E8DCC4'
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .hero-gradient {
+            background: linear-gradient(135deg, #FAF7F2 0%, #E8DCC4 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(212, 133, 106, 0.15);
+        }
+        
+        .product-image {
+            transition: transform 0.6s ease;
+        }
+        
+        .card-hover:hover .product-image {
+            transform: scale(1.08);
+        }
+        
+        .heart-icon {
+            transition: all 0.3s ease;
+        }
+        
+        .heart-icon:hover {
+            fill: #D4856A;
+            stroke: #D4856A;
+            transform: scale(1.2);
+        }
+        
+        .heart-icon.liked {
+            fill: #D4856A;
+            stroke: #D4856A;
+        }
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .filter-btn.active {
+            background-color: #D4856A;
+            color: white;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-cream font-sans antialiased">
+    
+    <!-- Navigation -->
+    <nav class="bg-white/95 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-3 items-center h-20">
+                <!-- Logo (Left) -->
+                <div class="flex items-center">
+                    <a href="main.html" class="flex items-center gap-3">
+                        <img src="assets/logo.png" alt="Crazy thrifts logo" class="w-10 h-10 object-cover rounded-full">
+                        <span class="font-display text-2xl font-bold text-charcoal">Crazy thrifts</span>
+                    </a>
+                </div>
+
+                <!-- Center: Get this Website -->
+                <div class="flex justify-center">
+                    <div class="text-center">
+                        <span class="font-medium text-charcoal">Get this Website</span>
+                    </div>
+                </div>
+
+                <!-- Right: WhatsApp CTA + Icons -->
+                <div class="flex items-center justify-end gap-4">
+                    <a href="https://wa.me/918840538304?text=Hi%2C%20I%20wanna%20buy%20the%20Thrift%20store%20site" title="Message: Hi, I wanna buy the Thrift store site" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-2 rounded-full text-sm font-medium shadow">
+                        <!-- Simple WhatsApp icon -->
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path d="M12.04 2C6.49 2 2 6.48 2 12c0 2.12.62 4.09 1.7 5.79L2 22l4.33-1.13A9.925 9.925 0 0 0 12.04 22C17.58 22 22.07 17.52 22.07 12S17.58 2 12.04 2zm5.47 13.48c-.25.7-1.46 1.35-2 1.44-.53.09-1.16.12-2.18-.36-3.34-1.81-5.5-5.04-5.67-5.29-.17-.25-1.41-1.8-1.41-3.43 0-1.63.87-2.43 1.18-2.74.31-.31.68-.37.9-.37.23 0 .47 0 .68 0 .22 0 .51-.07.79.58.28.65.95 2.26 1.03 2.43.08.17.14.36.03.58-.11.22-.16.36-.32.56-.16.21-.34.46-.49.62-.16.16-.33.36-.07.7.26.34 1.16 1.9 2.49 3.08 1.71 1.5 3.14 1.91 3.62 2.12.48.21.76.18 1.04.11.28-.07.9-.36 1.02-.71.12-.35.12-.65.08-.71z" />
+                        </svg>
+                        <span>WhatsApp</span>
+                    </a>
+
+                    <a href="#" title="Wishlist" aria-label="Wishlist" class="flex flex-col items-center text-slate-800 hover:text-yellow-600 transition">
+                        <span class="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center">
+                            <i data-lucide="heart" class="w-5 h-5 text-rose-500"></i>
+                        </span>
+                        <span id="wishlistCount" class="mt-1 text-xs text-slate-700">0</span>
+                    </a>
+
+                    <a href="#" title="Cart" aria-label="Cart" class="flex flex-col items-center text-slate-800 hover:text-yellow-600 transition">
+                        <span class="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center">
+                            <i data-lucide="shopping-bag" class="w-5 h-5 text-slate-900"></i>
+                        </span>
+                        <span id="cartCount" class="mt-1 text-xs text-slate-700">0</span>
+                    </a>
+
+                    <a href="admin.html" title="Admin" aria-label="Admin" class="flex flex-col items-center text-slate-800 hover:text-yellow-600 transition">
+                        <span class="w-9 h-9 rounded-full bg-yellow-50 flex items-center justify-center">
+                            <i data-lucide="user-circle" class="w-6 h-6 text-slate-900"></i>
+                        </span>
+                        <span class="mt-1 text-xs text-slate-700 hidden md:inline">Admin</span>
+                    </a>
+
+                    <button class="md:hidden text-charcoal" title="Menu" aria-label="Open menu">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="hero-gradient py-20 px-4">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="font-display text-5xl md:text-7xl font-bold text-charcoal mb-6 leading-tight">
+                Vintage Finds,<br/>Modern Style
+            </h1>
+            <p class="text-lg md:text-xl text-charcoal/70 max-w-2xl mx-auto mb-8 font-light">
+                Discover carefully curated secondhand treasures. Sustainable fashion that tells a story, one piece at a time.
+            </p>
+            <div class="flex gap-4 justify-center flex-wrap">
+                <a href="drop.html" class="bg-white hover:bg-gray-50 text-charcoal font-semibold px-8 py-4 rounded-full transition-all shadow-lg hover:shadow-xl">
+                    View New Drops
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Search & Filter -->
+    <section class="bg-white py-8 px-4 shadow-sm">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
+                <!-- Search Bar -->
+                <div class="relative flex-1 max-w-md w-full">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5"></i>
+                    <input 
+                        type="text" 
+                        id="searchInput"
+                        placeholder="Search for vintage treasures..."
+                        class="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-terracotta/50 transition-all"
+                    >
+                </div>
+                
+                <!-- Category Filters -->
+                <div class="flex gap-2 flex-wrap justify-center">
+                    <button onclick="filterCategory('all')" class="filter-btn active px-5 py-2 rounded-full border border-gray-200 text-sm font-medium hover:border-terracotta">
+                        All Items
+                    </button>
+                    <button onclick="filterCategory('clothing')" class="filter-btn px-5 py-2 rounded-full border border-gray-200 text-sm font-medium hover:border-terracotta">
+                        Clothing
+                    </button>
+                    <button onclick="filterCategory('accessories')" class="filter-btn px-5 py-2 rounded-full border border-gray-200 text-sm font-medium hover:border-terracotta">
+                        Accessories
+                    </button>
+                    <button onclick="filterCategory('shoes')" class="filter-btn px-5 py-2 rounded-full border border-gray-200 text-sm font-medium hover:border-terracotta">
+                        Shoes
+                    </button>
+                    <button onclick="filterCategory('bags')" class="filter-btn px-5 py-2 rounded-full border border-gray-200 text-sm font-medium hover:border-terracotta">
+                        Bags
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Products Grid -->
+    <section class="py-16 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-display text-3xl font-bold text-charcoal">Curated Collection</h2>
+                <select class="px-4 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-terracotta/50 text-sm">
+                    <option>Sort by: Featured</option>
+                    <option>Price: Low to High</option>
+                    <option>Price: High to Low</option>
+                    <option>Newest First</option>
+                </select>
+            </div>
+            
+            <div id="productsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <!-- Products will be rendered here by JavaScript -->
+            </div>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden text-center py-20">
+                <i data-lucide="package-x" class="w-16 h-16 mx-auto text-gray-300 mb-4"></i>
+                <p class="text-gray-500 text-lg">No items found</p>
+            </div>
+        </div>
+    </section>
+    
+    
+    <!-- Footer -->
+    <footer class="bg-charcoal text-white py-12 px-4">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <!-- Brand -->
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <img src="assets/logo.png" alt="Crazy thrifts logo" class="w-8 h-8 object-cover rounded-full">
+                        <span class="font-display text-xl font-bold">Crazy thrifts</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">Curated secondhand fashion for the conscious consumer.</p>
+                </div>
+                
+                <!-- Shop -->
+                <div>
+                    <h3 class="font-semibold mb-4">Shop</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-terracotta transition-colors">All Items</a></li>
+                        <li><a href="drop.html" class="hover:text-terracotta transition-colors">New Drops</a></li>
+                        <li><a href="#" class="hover:text-terracotta transition-colors">Sale</a></li>
+                        <li><a href="#" class="hover:text-terracotta transition-colors">Gift Cards</a></li>
+                    </ul>
+                </div>
+                
+                <!-- About -->
+                <div>
+                    <h3 class="font-semibold mb-4">About</h3>
+                    <ul class="space-y-2 text-sm text-gray-400">
+                        <li><a href="#" class="hover:text-terracotta transition-colors">Our Story</a></li>
+                        <li><a href="#" class="hover:text-terracotta transition-colors">Contact</a></li>
+                        <li><a href="admin.html" class="hover:text-terracotta transition-colors">Sell With Us</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Connect -->
+                <div>
+                    <h3 class="font-semibold mb-4">Connect</h3>
+                    <div class="flex gap-3 mb-4">
+                        <a href="#" class="w-10 h-10 bg-white/10 hover:bg-terracotta rounded-full flex items-center justify-center transition-colors">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 hover:bg-terracotta rounded-full flex items-center justify-center transition-colors">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 hover:bg-terracotta rounded-full flex items-center justify-center transition-colors">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
+                <p>&copy; 2026 Crazy thrifts. Designed with care for sustainable fashion.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <script>
+        // Sample Product Data
+        const sampleProducts = [
+            { id: 1, name: 'Vintage Levi\'s Denim Jacket', price: 4500, category: 'clothing', image: 'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&h=800&fit=crop', condition: 'Excellent', story: 'Classic 90s denim with authentic wear' },
+            { id: 2, name: 'Leather Crossbody Bag', price: 3200, category: 'bags', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&h=800&fit=crop', condition: 'Good', story: 'Genuine leather with vintage patina' },
+            { id: 3, name: 'Retro Floral Maxi Dress', price: 2800, category: 'clothing', image: 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&h=800&fit=crop', condition: 'Like New', story: '70s inspired flowing silhouette' },
+            { id: 4, name: 'Vintage Converse High Tops', price: 3500, category: 'shoes', image: 'https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=600&h=800&fit=crop', condition: 'Excellent', story: 'Rare colorway from 1985' },
+            { id: 5, name: 'Silk Paisley Scarf', price: 1500, category: 'accessories', image: 'https://images.unsplash.com/photo-1601924357840-3e97387d2e2b?w=600&h=800&fit=crop', condition: 'Excellent', story: 'Pure silk with handrolled edges' },
+            { id: 6, name: 'Oversized Blazer', price: 4200, category: 'clothing', image: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=800&fit=crop', condition: 'Like New', story: 'Power dressing perfection' },
+            { id: 7, name: 'Woven Straw Tote', price: 2500, category: 'bags', image: 'https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=600&h=800&fit=crop', condition: 'Good', story: 'Handcrafted summer essential' },
+            { id: 8, name: 'Gold Hoop Earrings', price: 1800, category: 'accessories', image: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=600&h=800&fit=crop', condition: 'Excellent', story: 'Timeless statement pieces' }
+        ];
+        
+        // Initialize products from localStorage or use sample data
+        let products = JSON.parse(localStorage.getItem('products')) || sampleProducts;
+        let wishlist = JSON.parse(localStorage.getItem('wishlist')) || [];
+        let currentFilter = 'all';
+        
+        // Render Products
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = products.filter(p => {
+                const matchesCategory = currentFilter === 'all' || p.category === currentFilter;
+                const matchesSearch = p.name.toLowerCase().includes(searchTerm);
+                return matchesCategory && matchesSearch;
+            });
+            
+            if (filtered.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+            
+            grid.innerHTML = filtered.map(product => {
+                const isLiked = wishlist.includes(product.id);
+                return `
+                    <div class="card-hover bg-white rounded-2xl overflow-hidden shadow-md fade-in">
+                        <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                            <img src="${product.image}" 
+                                 alt="${product.name}" 
+                                 class="product-image w-full h-full object-cover">
+                            <button onclick="toggleWishlist(${product.id})" 
+                                    class="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:bg-white transition-all">
+                                <i data-lucide="heart" class="heart-icon w-5 h-5 ${isLiked ? 'liked' : 'text-charcoal'}"></i>
+                            </button>
+                            <span class="absolute bottom-4 left-4 bg-sage/90 backdrop-blur-sm text-white text-xs font-semibold px-3 py-1 rounded-full">
+                                ${product.condition}
+                            </span>
+                        </div>
+                        <div class="p-5">
+                            <span class="text-xs text-gray-500 uppercase tracking-wide font-medium">${product.category}</span>
+                            <h3 class="font-semibold text-lg text-charcoal mt-1 mb-2">${product.name}</h3>
+                            <p class="text-sm text-gray-600 mb-3 line-clamp-1 italic">${product.story}</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-2xl font-bold text-terracotta">₹${product.price.toLocaleString()}</span>
+                                <button onclick="openCheckoutModal(${product.id})" class="bg-yellow-400 hover:bg-yellow-500 text-slate-900 font-medium px-5 py-2 rounded-full transition-all text-sm shadow-md hover:shadow-lg flex items-center gap-2">
+                                    <i data-lucide="truck" class="w-4 h-4"></i>
+                                    Buy
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            lucide.createIcons();
+        }
+        
+        // Filter by Category
+        function filterCategory(category) {
+            currentFilter = category;
+            
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderProducts();
+        }
+        
+        // Toggle Wishlist
+        function toggleWishlist(productId) {
+            const index = wishlist.indexOf(productId);
+            if (index > -1) {
+                wishlist.splice(index, 1);
+            } else {
+                wishlist.push(productId);
+            }
+            localStorage.setItem('wishlist', JSON.stringify(wishlist));
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+            renderProducts();
+        }
+        
+        // Search Functionality
+        document.getElementById('searchInput').addEventListener('input', renderProducts);
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            document.getElementById('wishlistCount').textContent = wishlist.length;
+            lucide.createIcons();
+        });
+    </script>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal fixed inset-0 bg-black/40 z-50 items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-md w-full text-slate-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="font-semibold text-lg">Confirm Purchase</h3>
+                <button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-slate-700">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="checkoutProduct" class="mb-4 text-sm text-slate-600"></div>
+            <div class="space-y-3 mb-4">
+                <input id="custName" placeholder="Name" class="w-full px-4 py-3 border rounded-lg" />
+                <input id="custPhone" placeholder="WhatsApp Number" class="w-full px-4 py-3 border rounded-lg" />
+                <textarea id="custAddress" rows="2" placeholder="Shipping Address" class="w-full px-4 py-3 border rounded-lg"></textarea>
+                <input id="custPincode" placeholder="Pincode" class="w-full px-4 py-3 border rounded-lg" />
+            </div>
+            <div class="flex gap-3">
+                <button onclick="confirmOrder()" class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-4 py-3 rounded-lg flex items-center justify-center gap-2">
+                    <i data-lucide="check" class="w-4 h-4"></i>
+                    Confirm Order
+                </button>
+                <button onclick="closeCheckoutModal()" class="px-4 py-3 bg-gray-100 rounded-lg">Cancel</button>
+            </div>
+            <p id="checkoutSuccess" class="mt-3 text-sm text-green-600 hidden">Order placed — thank you!</p>
+        </div>
+    </div>
+
+    <script>
+        // Orders storage and checkout logic
+        let orders = JSON.parse(localStorage.getItem('orders')) || [];
+        let checkoutProductId = null;
+
+        function openCheckoutModal(productId) {
+            checkoutProductId = productId;
+            const p = products.find(x => x.id === productId) || {};
+            document.getElementById('checkoutProduct').textContent = `${p.name || 'Item'} — ₹${(p.price || 0).toLocaleString()}`;
+            document.getElementById('checkoutSuccess').classList.add('hidden');
+            document.getElementById('checkoutModal').classList.remove('hidden');
+            lucide.createIcons();
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custAddress').value = '';
+            document.getElementById('custPincode').value = '';
+        }
+
+        function confirmOrder() {
+            const name = document.getElementById('custName').value.trim();
+            const phone = document.getElementById('custPhone').value.trim();
+            const address = document.getElementById('custAddress').value.trim();
+            const pincode = document.getElementById('custPincode').value.trim();
+
+            if (!name || !phone || !address || !pincode) {
+                alert('Please complete all fields');
+                return;
+            }
+
+            const p = products.find(x => x.id === checkoutProductId) || {};
+            const order = {
+                id: Date.now(),
+                productId: checkoutProductId,
+                productName: p.name || 'Unknown',
+                name,
+                phone,
+                address,
+                pincode,
+                orderDate: new Date().toISOString(),
+                status: 'Pending',
+                trackingId: ''
+            };
+
+            orders.push(order);
+            localStorage.setItem('orders', JSON.stringify(orders));
+
+            document.getElementById('checkoutSuccess').classList.remove('hidden');
+
+            // small delay then close modal
+            setTimeout(() => {
+                closeCheckoutModal();
+            }, 900);
+
+            // Dispatch a storage event for other pages (Admin) that might be listening
+            window.dispatchEvent(new Event('storage'));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Crazy thrifts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        terracotta: '#D4856A',
+                        sage: '#8B9D83',
+                        dustyRose: '#D4A5A5',
+                        cream: '#FAF7F2',
+                        charcoal: '#2C2C2C',
+                        warmBeige: '#E8DCC4'
+                    },
+                    fontFamily: {
+                        display: ['"Playfair Display"', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        .sidebar {
+            transition: transform 0.3s ease;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar.hidden {
+                transform: translateX(-100%);
+            }
+        }
+        
+        .modal {
+            display: none;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #D4856A;
+            ring: 2px;
+            ring-color: rgba(212, 133, 106, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-cream font-sans antialiased">
+    
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar w-64 bg-charcoal text-white flex flex-col">
+            <div class="p-6 border-b border-gray-700">
+                <div class="flex items-center gap-2 mb-2">
+                    <img src="assets/logo.png" alt="Crazy thrifts logo" class="w-10 h-10 object-cover rounded-full">
+                    <span class="font-display text-xl font-bold">Crazy thrifts</span>
+                </div>
+                <p class="text-sm text-gray-400">Admin Dashboard</p>
+            </div>
+            
+            <nav class="flex-1 p-4 overflow-y-auto">
+                <button onclick="switchSection('dashboard')" 
+                        class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 bg-terracotta font-semibold">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    Dashboard
+                </button>
+                <button onclick="switchSection('products')" 
+                        class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 hover:bg-gray-800 transition-colors">
+                    <i data-lucide="package" class="w-5 h-5"></i>
+                    Products
+                </button>
+                <button onclick="switchSection('orders')" 
+                        class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 hover:bg-gray-800 transition-colors">
+                    <i data-lucide="truck" class="w-5 h-5"></i>
+                    Orders
+                </button>
+                <button onclick="switchSection('add')" 
+                        class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 hover:bg-gray-800 transition-colors">
+                    <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                    Add Product
+                </button>
+                <button onclick="switchSection('analytics')" 
+                        class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg mb-2 hover:bg-gray-800 transition-colors">
+                    <i data-lucide="bar-chart-3" class="w-5 h-5"></i>
+                    Analytics
+                </button>
+            </nav>
+            
+            <div class="p-4 border-t border-gray-700">
+                <a href="main.html" 
+                   class="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg hover:bg-gray-800 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i>
+                    Back to Store
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="p-8">
+                <div class="mb-8">
+                    <h1 class="font-display text-4xl font-bold text-charcoal mb-2">Dashboard</h1>
+                    <p class="text-gray-600">Welcome back! Here's your store overview.</p>
+                </div>
+                
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-terracotta/10 rounded-full flex items-center justify-center">
+                                <i data-lucide="package" class="w-6 h-6 text-terracotta"></i>
+                            </div>
+                            <span class="text-green-600 text-sm font-semibold">+12%</span>
+                        </div>
+                        <h3 class="text-gray-600 text-sm mb-1">Total Products</h3>
+                        <p class="text-3xl font-bold text-charcoal" id="totalProducts">0</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-sage/10 rounded-full flex items-center justify-center">
+                                <i data-lucide="shopping-cart" class="w-6 h-6 text-sage"></i>
+                            </div>
+                            <span class="text-green-600 text-sm font-semibold">+8%</span>
+                        </div>
+                        <h3 class="text-gray-600 text-sm mb-1">Orders Today</h3>
+                        <p class="text-3xl font-bold text-charcoal" id="ordersCount">0</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-dustyRose/10 rounded-full flex items-center justify-center">
+                                <i data-lucide="indian-rupee" class="w-6 h-6 text-dustyRose"></i>
+                            </div>
+                            <span class="text-green-600 text-sm font-semibold">+15%</span>
+                        </div>
+                        <h3 class="text-gray-600 text-sm mb-1">Revenue</h3>
+                        <p class="text-3xl font-bold text-charcoal">₹1.2L</p>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                            <span class="text-green-600 text-sm font-semibold">+5%</span>
+                        </div>
+                        <h3 class="text-gray-600 text-sm mb-1">Customers</h3>
+                        <p class="text-3xl font-bold text-charcoal">156</p>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-2xl p-6 shadow-md">
+                    <h2 class="font-bold text-xl text-charcoal mb-4">Recent Activity</h2>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-4 pb-4 border-b border-gray-100">
+                            <div class="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
+                                <i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-charcoal">New order received</p>
+                                <p class="text-sm text-gray-500">2 minutes ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 pb-4 border-b border-gray-100">
+                            <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                                <i data-lucide="plus-circle" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-charcoal">Product added to inventory</p>
+                                <p class="text-sm text-gray-500">1 hour ago</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-orange-50 rounded-full flex items-center justify-center">
+                                <i data-lucide="alert-circle" class="w-5 h-5 text-orange-600"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-medium text-charcoal">Low stock alert</p>
+                                <p class="text-sm text-gray-500">3 hours ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Products Section -->
+            <section id="productsSection" class="p-8 hidden">
+                <div class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h1 class="font-display text-4xl font-bold text-charcoal mb-2">Product Management</h1>
+                        <p class="text-gray-600">View, edit, and delete your products</p>
+                    </div>
+                    <button onclick="switchSection('add')" 
+                            class="bg-terracotta hover:bg-terracotta/90 text-white font-semibold px-6 py-3 rounded-full transition-all shadow-lg flex items-center gap-2">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        Add Product
+                    </button>
+                </div>
+                
+                <!-- Products Table -->
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Category</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Condition</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="productsTable" class="divide-y divide-gray-200">
+                                <!-- Products will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Orders Section -->
+            <section id="ordersSection" class="p-8 hidden">
+                <div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h1 class="font-display text-4xl font-bold text-charcoal mb-2">Order Management</h1>
+                        <p class="text-gray-600">View and manage customer orders</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label for="ordersDateFilter" class="text-sm text-gray-600">Filter by date</label>
+                        <input id="ordersDateFilter" type="date" class="px-3 py-2 border rounded-md" onchange="renderOrdersTable()" />
+                        <button onclick="document.getElementById('ordersDateFilter').value=''; renderOrdersTable();" class="px-3 py-2 bg-slate-100 rounded-md">Clear</button>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-md overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b border-gray-200">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Item</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order Date</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Phone</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Tracking ID</th>
+                                    <th class="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                                    <th class="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTable" class="divide-y divide-gray-200 text-sm text-slate-700">
+                                <!-- Orders will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Add Product Section -->
+            <section id="addSection" class="p-8 hidden">
+                <div class="mb-8">
+                    <h1 class="font-display text-4xl font-bold text-charcoal mb-2">Add New Product</h1>
+                    <p class="text-gray-600">Fill in the details to add a product to your inventory</p>
+                </div>
+                
+                <div class="max-w-3xl bg-white rounded-2xl p-8 shadow-md">
+                    <form id="addProductForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-charcoal mb-2">Product Name</label>
+                                <input type="text" 
+                                       id="productName" 
+                                       required 
+                                       class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl transition-all"
+                                       placeholder="Vintage Levi's Jacket">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-charcoal mb-2">Price (₹)</label>
+                                <input type="number" 
+                                       id="productPrice" 
+                                       required 
+                                       class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl transition-all"
+                                       placeholder="4500">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-semibold text-charcoal mb-2">Category</label>
+                                <select id="productCategory" 
+                                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl transition-all">
+                                    <option value="clothing">Clothing</option>
+                                    <option value="accessories">Accessories</option>
+                                    <option value="shoes">Shoes</option>
+                                    <option value="bags">Bags</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-charcoal mb-2">Condition</label>
+                                <select id="productCondition" 
+                                        class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl transition-all">
+                                    <option value="Like New">Like New</option>
+                                    <option value="Excellent">Excellent</option>
+                                    <option value="Good">Good</option>
+                                    <option value="Fair">Fair</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-charcoal mb-2">Image URL</label>
+                            <input type="url" 
+                                   id="productImage" 
+                                   required 
+                                   class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl transition-all"
+                                   placeholder="https://example.com/image.jpg">
+                            <p class="text-xs text-gray-500 mt-1">Use a direct image link (JPG, PNG, WebP)</p>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-semibold text-charcoal mb-2">Product Story</label>
+                            <textarea id="productStory" 
+                                      rows="3" 
+                                      class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl transition-all"
+                                      placeholder="Share the story behind this vintage piece..."></textarea>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button type="submit" 
+                                    class="flex-1 bg-terracotta hover:bg-terracotta/90 text-white font-semibold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl">
+                                <i data-lucide="check" class="w-5 h-5 inline mr-2"></i>
+                                Add Product
+                            </button>
+                            <button type="button" 
+                                    onclick="document.getElementById('addProductForm').reset()" 
+                                    class="px-8 bg-gray-200 hover:bg-gray-300 text-charcoal font-semibold py-4 rounded-xl transition-all">
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+            
+            <!-- Analytics Section -->
+            <section id="analyticsSection" class="p-8 hidden">
+                <div class="mb-8">
+                    <h1 class="font-display text-4xl font-bold text-charcoal mb-2">Analytics</h1>
+                    <p class="text-gray-600">Track your store performance</p>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <h3 class="font-bold text-lg mb-4">Top Categories</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm font-medium">Clothing</span>
+                                    <span class="text-sm text-gray-600">45%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-terracotta h-2 rounded-full" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm font-medium">Accessories</span>
+                                    <span class="text-sm text-gray-600">30%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-sage h-2 rounded-full" style="width: 30%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm font-medium">Shoes</span>
+                                    <span class="text-sm text-gray-600">15%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-dustyRose h-2 rounded-full" style="width: 15%"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <span class="text-sm font-medium">Bags</span>
+                                    <span class="text-sm text-gray-600">10%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-blue-500 h-2 rounded-full" style="width: 10%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl p-6 shadow-md">
+                        <h3 class="font-bold text-lg mb-4">Sales Overview</h3>
+                        <div class="text-center py-8">
+                            <i data-lucide="trending-up" class="w-16 h-16 mx-auto text-green-500 mb-4"></i>
+                            <p class="text-4xl font-bold text-charcoal mb-2">₹1,25,450</p>
+                            <p class="text-gray-600">Total sales this month</p>
+                            <div class="flex items-center justify-center gap-2 mt-4 text-green-600">
+                                <i data-lucide="arrow-up" class="w-4 h-4"></i>
+                                <span class="font-semibold">+18.5% from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal fixed inset-0 bg-black/50 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="font-display text-3xl font-bold text-charcoal">Edit Product</h2>
+                <button onclick="closeEditModal()" class="text-gray-400 hover:text-charcoal transition-colors">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <form id="editProductForm" class="space-y-6">
+                <input type="hidden" id="editProductId">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-charcoal mb-2">Product Name</label>
+                        <input type="text" id="editName" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-charcoal mb-2">Price (₹)</label>
+                        <input type="number" id="editPrice" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl">
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-sm font-semibold text-charcoal mb-2">Category</label>
+                        <select id="editCategory" class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl">
+                            <option value="clothing">Clothing</option>
+                            <option value="accessories">Accessories</option>
+                            <option value="shoes">Shoes</option>
+                            <option value="bags">Bags</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-semibold text-charcoal mb-2">Condition</label>
+                        <select id="editCondition" class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl">
+                            <option value="Like New">Like New</option>
+                            <option value="Excellent">Excellent</option>
+                            <option value="Good">Good</option>
+                            <option value="Fair">Fair</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-charcoal mb-2">Image URL</label>
+                    <input type="url" id="editImage" required class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-charcoal mb-2">Product Story</label>
+                    <textarea id="editStory" rows="3" class="form-input w-full px-4 py-3 border border-gray-300 rounded-xl"></textarea>
+                </div>
+                
+                <button type="submit" 
+                        class="w-full bg-terracotta hover:bg-terracotta/90 text-white font-semibold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl">
+                    Save Changes
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let products = JSON.parse(localStorage.getItem('products')) || [];
+        let currentSection = 'dashboard';
+        let editingId = null;
+        
+        // Section Switching
+        function switchSection(section) {
+            document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`${section}Section`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-terracotta', 'font-semibold');
+                btn.classList.add('hover:bg-gray-800');
+            });
+            
+            event.target.closest('.nav-btn').classList.add('bg-terracotta', 'font-semibold');
+            event.target.closest('.nav-btn').classList.remove('hover:bg-gray-800');
+            
+            currentSection = section;
+            
+            if (section === 'products') {
+                renderProductsTable();
+            } else if (section === 'dashboard') {
+                updateDashboard();
+            }
+            
+            lucide.createIcons();
+        }
+        
+        // Add Product
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const product = {
+                id: Date.now(),
+                name: document.getElementById('productName').value,
+                price: parseInt(document.getElementById('productPrice').value),
+                category: document.getElementById('productCategory').value,
+                condition: document.getElementById('productCondition').value,
+                image: document.getElementById('productImage').value,
+                story: document.getElementById('productStory').value
+            };
+            
+            products.push(product);
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            this.reset();
+            alert('✅ Product added successfully!');
+            switchSection('products');
+        });
+        
+        // Render Products Table
+        function renderProductsTable() {
+            const table = document.getElementById('productsTable');
+            
+            if (products.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <i data-lucide="package-x" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                            <p>No products yet. Add your first product!</p>
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+            
+            table.innerHTML = products.map(p => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <img src="${p.image}" alt="${p.name}" class="w-12 h-12 rounded-lg object-cover">
+                            <span class="font-medium text-charcoal">${p.name}</span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full capitalize">${p.category}</span>
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-charcoal">₹${p.price.toLocaleString()}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-green-50 text-green-700 text-xs font-medium rounded-full">${p.condition}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="openEditModal(${p.id})" 
+                                class="text-blue-600 hover:text-blue-700 mr-3 transition-colors">
+                            <i data-lucide="edit" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="deleteProduct(${p.id})" 
+                                class="text-red-600 hover:text-red-700 transition-colors">
+                            <i data-lucide="trash-2" class="w-5 h-5"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            lucide.createIcons();
+        }
+        
+        // Open Edit Modal
+        function openEditModal(id) {
+            const product = products.find(p => p.id === id);
+            if (!product) return;
+            
+            editingId = id;
+            document.getElementById('editProductId').value = id;
+            document.getElementById('editName').value = product.name;
+            document.getElementById('editPrice').value = product.price;
+            document.getElementById('editCategory').value = product.category;
+            document.getElementById('editCondition').value = product.condition;
+            document.getElementById('editImage').value = product.image;
+            document.getElementById('editStory').value = product.story || '';
+            
+            document.getElementById('editModal').classList.add('active');
+            lucide.createIcons();
+        }
+        
+        // Close Edit Modal
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+            editingId = null;
+        }
+        
+        // Edit Product
+        document.getElementById('editProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const index = products.findIndex(p => p.id === editingId);
+            if (index === -1) return;
+            
+            products[index] = {
+                ...products[index],
+                name: document.getElementById('editName').value,
+                price: parseInt(document.getElementById('editPrice').value),
+                category: document.getElementById('editCategory').value,
+                condition: document.getElementById('editCondition').value,
+                image: document.getElementById('editImage').value,
+                story: document.getElementById('editStory').value
+            };
+            
+            localStorage.setItem('products', JSON.stringify(products));
+            closeEditModal();
+            renderProductsTable();
+            alert('✅ Product updated successfully!');
+        });
+        
+        // Delete Product
+        function deleteProduct(id) {
+            if (!confirm('Are you sure you want to delete this product?')) return;
+            
+            products = products.filter(p => p.id !== id);
+            localStorage.setItem('products', JSON.stringify(products));
+            renderProductsTable();
+            updateDashboard();
+            alert('✅ Product deleted successfully!');
+        }
+        
+        // Update Dashboard
+        function updateDashboard() {
+            document.getElementById('totalProducts').textContent = products.length;
+        }
+
+        // Orders management
+        function loadOrders() {
+            return JSON.parse(localStorage.getItem('orders')) || [];
+        }
+
+        function updateOrdersCount() {
+            const orders = loadOrders();
+            document.getElementById('ordersCount').textContent = orders.length;
+        }
+
+        function formatISOToDateInput(iso) {
+            if (!iso) return '';
+            const d = new Date(iso);
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+
+        function saveOrderDate(orderId) {
+            const val = document.getElementById(`date-${orderId}`).value;
+            if (!val) return;
+            const orders = loadOrders();
+            const idx = orders.findIndex(o => o.id === orderId);
+            if (idx === -1) return;
+            orders[idx].orderDate = new Date(val + 'T00:00:00').toISOString();
+            localStorage.setItem('orders', JSON.stringify(orders));
+            renderOrdersTable();
+            updateOrdersCount();
+            alert('Order date updated');
+        }
+
+        function renderOrdersTable() {
+            let orders = loadOrders();
+            const table = document.getElementById('ordersTable');
+            const filterDate = document.getElementById('ordersDateFilter') ? document.getElementById('ordersDateFilter').value : '';
+
+            if (filterDate) {
+                orders = orders.filter(o => (o.orderDate ? o.orderDate.slice(0,10) : '') === filterDate);
+            }
+
+            if (!orders || orders.length === 0) {
+                table.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                            <i data-lucide="inbox" class="w-12 h-12 mx-auto mb-3 text-gray-300"></i>
+                            <p>No orders found for this date.</p>
+                        </td>
+                    </tr>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            // sort by orderDate desc
+            orders.sort((a,b) => new Date(b.orderDate || 0) - new Date(a.orderDate || 0));
+
+            table.innerHTML = orders.map(o => `
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-6 py-4">
+                        <div class="font-medium">${o.name}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="font-medium">${o.productName}</div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <input id="date-${o.id}" type="date" value="${formatISOToDateInput(o.orderDate)}" class="px-3 py-2 border rounded-md text-sm" />
+                            <button onclick="saveOrderDate(${o.id})" class="px-3 py-2 bg-slate-100 rounded-md text-sm hover:bg-slate-200">Save</button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <span class="truncate max-w-[20rem]">${o.address}, Pincode: ${o.pincode}</span>
+                            <button onclick="copyAddress(${o.id})" class="text-gray-600 hover:text-slate-800 ml-2" title="Copy address">
+                                <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-3">
+                            <span>${o.phone}</span>
+                            <button onclick="sendWhatsApp(${o.id})" class="ml-2 text-green-600 hover:text-green-700" title="WhatsApp notify">
+                                <i data-lucide="message-circle" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex items-center gap-2">
+                            <input id="tracking-${o.id}" value="${o.trackingId || ''}" class="px-3 py-2 border rounded-md text-sm w-36" placeholder="Tracking ID" />
+                            <button onclick="saveTracking(${o.id})" class="px-3 py-2 bg-slate-100 rounded-md text-sm hover:bg-slate-200">Save</button>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 rounded-full text-xs font-medium ${o.status === 'Pending' ? 'bg-yellow-100 text-yellow-700' : o.status === 'Shipped' ? 'bg-sky-100 text-sky-700' : 'bg-green-100 text-green-700'}">${o.status}</span>
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <button onclick="changeOrderStatus(${o.id}, 'Shipped')" class="text-indigo-600 hover:text-indigo-800 mr-3" title="Mark as Shipped">
+                            <i data-lucide="truck" class="w-5 h-5"></i>
+                        </button>
+                        <button onclick="changeOrderStatus(${o.id}, 'Delivered')" class="text-green-600 hover:text-green-800" title="Mark as Delivered">
+                            <i data-lucide="check-circle" class="w-5 h-5"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            lucide.createIcons();
+        }
+
+        function saveTracking(orderId) {
+            const val = document.getElementById(`tracking-${orderId}`).value.trim();
+            const orders = loadOrders();
+            const idx = orders.findIndex(o => o.id === orderId);
+            if (idx === -1) return;
+            orders[idx].trackingId = val;
+            if (val && orders[idx].status === 'Pending') orders[idx].status = 'Shipped';
+            localStorage.setItem('orders', JSON.stringify(orders));
+            renderOrdersTable();
+            updateOrdersCount();
+            alert('Tracking updated');
+        }
+
+        function changeOrderStatus(orderId, status) {
+            const orders = loadOrders();
+            const idx = orders.findIndex(o => o.id === orderId);
+            if (idx === -1) return;
+            orders[idx].status = status;
+            localStorage.setItem('orders', JSON.stringify(orders));
+            renderOrdersTable();
+            updateOrdersCount();
+        }
+
+        function copyAddress(orderId) {
+            const orders = loadOrders();
+            const o = orders.find(x => x.id === orderId);
+            if (!o) return;
+            const text = `${o.name}\n${o.address}\nPincode: ${o.pincode}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Address copied to clipboard');
+            }).catch(() => alert('Unable to copy')); 
+        }
+
+        function sendWhatsApp(orderId) {
+            const orders = loadOrders();
+            const o = orders.find(x => x.id === orderId);
+            if (!o) return;
+            const phone = o.phone.replace(/\D/g, '');
+            const message = `Hi ${o.name}, your order for ${o.productName} is ${o.status}${o.trackingId ? '. Tracking ID: ' + o.trackingId : ''}`;
+            const url = `https://wa.me/${phone}?text=` + encodeURIComponent(message);
+            window.open(url, '_blank');
+        }
+
+        // Listen for storage updates from other tabs/pages
+        window.addEventListener('storage', () => {
+            renderOrdersTable();
+            updateOrdersCount();
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDashboard();
+            renderProductsTable();
+            renderOrdersTable();
+            updateOrdersCount();
+            lucide.createIcons();
+        });
+    </script>
+</body>
+</html>
